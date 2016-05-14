@@ -28,7 +28,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 var assert = require("assert");
 var testUtils = require("./helpers/util.js");
-var Promise = require('../../js/debug/bluebird.js');
+// Error.stackTraceLimit = 30;
 
 describe("Promise.map-test", function () {
 

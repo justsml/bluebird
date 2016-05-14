@@ -146,6 +146,8 @@ MappingPromiseArray.prototype.preservedValues = function () {
 
 function map(promises, fn, options, _filter) {
     if (typeof fn !== "function") {
+        console.error("Failer to avoid error!");
+        console.trace("Failer to avoid error!");
         return apiRejection(FUNCTION_ERROR + util.classString(fn));
     }
     var limit = typeof Promise.concurrency._limit === "number" 
@@ -175,13 +177,14 @@ function _concurrency(limit, value) {
         value._limit = limit;
     } else {
         Promise.concurrency._limit = limit;
+        return Promise;
     }
     return value;
-};
+}
 
 Promise.concurrency = _concurrency;
 Promise.prototype.concurrency = function (limit) {
-    return concurrency(limit, this);
+    return _concurrency(limit, this);
 };
 
 };
