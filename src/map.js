@@ -148,12 +148,15 @@ function map(promises, fn, options, _filter) {
     if (typeof fn !== "function") {
         return apiRejection(FUNCTION_ERROR + util.classString(fn));
     }
-    var limit = promises instanceof Promise || promises instanceof PromiseArray 
+    var limit = typeof Promise.concurrency._limit === "number" 
+        ?  Promise.concurrency._limit
+        : promises instanceof Promise || promises instanceof PromiseArray
         && typeof promises._limit === "number" 
         ? promises._limit
         : typeof options === "object" && options !== null
         ? options.concurrency
         : 0;
+    Promise.concurrency._limit = undefined;
     limit = typeof limit === "number" &&
         isFinite(limit) && limit >= 1 ? limit : 0;
     return new MappingPromiseArray(promises, fn, limit, _filter).promise();
@@ -167,15 +170,16 @@ Promise.map = function (promises, fn, options, _filter) {
     return map(promises, fn, options, _filter);
 };
 
-var concurrency = Promise.concurrency = function _concurrency(limit, value) {
+function _concurrency(limit, value) {
     if (value instanceof Promise || value instanceof PromiseArray) {
         value._limit = limit;
     } else {
-        return apiRejection(FUNCTION_ERROR + util.classString(value));
+        Promise.concurrency._limit = limit;
     }
     return value;
 };
 
+Promise.concurrency = _concurrency;
 Promise.prototype.concurrency = function (limit) {
     return concurrency(limit, this);
 };
